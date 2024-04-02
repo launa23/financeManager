@@ -28,8 +28,9 @@ public class CategoryController {
                 List<String> errorMess = result.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
                 return ResponseEntity.badRequest().body(errorMess);
             }
+            long[] userIds = new long[]{0, 1};
             boolean typeBoolean = type.equals("income");
-            Category category = categoryService.createCategory(categoryDTO.getUserId(), categoryDTO, typeBoolean);
+            Category category = categoryService.createCategory(userIds, categoryDTO, typeBoolean);
             CategoryResponse categoryResponse = CategoryResponse.builder()
                     .id(category.getId())
                     .name(category.getName())

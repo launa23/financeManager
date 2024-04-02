@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 public interface ICategoryService {
-    Category createCategory(long userId, CategoryDTO categoryDTO, boolean type) throws Exception;
+    Category createCategory(long[] userId, CategoryDTO categoryDTO, boolean type) throws Exception;
 
     Category getCategoryById(long userId, long id,  boolean type) throws DataNotFoundException;
 

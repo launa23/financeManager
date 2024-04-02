@@ -12,9 +12,11 @@ public interface ITransactionService {
 
     List<TransactionResponse> getAllTransactionsInWallet(long[] userId, long walletId) throws Exception;
 
-    List<Transaction> getTransactionInWalletByType(long walletId, boolean type) throws Exception;
+    List<TransactionResponse> getAllTransactionsByUser(long userId) throws Exception;
 
-    Transaction updateTransaction(long id, TransactionDTO transactionDTO) throws Exception;
+    List<TransactionResponse> getTransactionInWalletByType(long userId, long walletId, boolean type) throws Exception;
 
-    void deleteTransaction(long id) throws Exception;
+    Transaction updateTransaction(long[] userId, long id, TransactionDTO transactionDTO, boolean type) throws Exception;
+
+    void deleteTransaction(long userId, long id, boolean type) throws Exception;
 }

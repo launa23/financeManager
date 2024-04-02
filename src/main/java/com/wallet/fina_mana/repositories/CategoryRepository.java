@@ -21,6 +21,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findByIdAndActiveAndType(long id, boolean active, boolean type);
 
     @Query(value = "SELECT * FROM categories c " +
+            "WHERE c.user_id IN :user and c.name = :name and c.active = 1 and c.type = :type", nativeQuery = true)
+    Optional<Category> existsByUserIdInAndNameAndActiveAndTypeLaun(@Param("user") long[] userId, @Param("name") String name, @Param("type") boolean type);
+
+    @Query(value = "SELECT * FROM categories c " +
             "WHERE c.user_id IN :user and c.id = :id and c.active = 1 and c.type = :type", nativeQuery = true)
     Optional<Category> findByUserIdAndIdAndTypeLaun(@Param("user") long[] userId, @Param("id") long id, @Param("type") boolean type);
     @Query(value = "SELECT * FROM categories c WHERE c.name = :name and c.active = 1 and type = :type and c.id != :id ",

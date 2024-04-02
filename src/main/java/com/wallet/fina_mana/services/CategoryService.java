@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,10 +24,10 @@ public class CategoryService implements ICategoryService{
     private final CategoryRepository categoryRepository;
     private final CategoryHierarchyRepository categoryHierarchyRepository;
     @Override
-    public Category createCategory(long userId, CategoryDTO categoryDTO, boolean type) throws Exception {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("Cannot find user id: " + userId));
-        if (categoryRepository.existsByUserIdAndNameAndActiveAndType(userId, categoryDTO.getName(), true, type)){
+    public Category createCategory(long[] userId, CategoryDTO categoryDTO, boolean type) throws Exception {
+        User user = userRepository.findById(userId[1])
+                .orElseThrow(() -> new DataNotFoundException("Cannot find user id: " + userId[1]));
+        if (categoryRepository.existsByUserIdInAndNameAndActiveAndTypeLaun(userId, categoryDTO.getName(), type).isPresent()){
             throw new Exception("Category is already exist");
         }
         if (categoryDTO.getParentId() == null || categoryDTO.getParentId().isEmpty()){

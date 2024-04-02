@@ -3,6 +3,7 @@ package com.wallet.fina_mana.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -29,7 +30,7 @@ public class Transaction {
     private String description;
 
     @Column(name = "time", nullable = false)
-    private Date time;
+    private LocalDateTime time;
 
     @Column(name = "type", nullable = false)
     private boolean type;

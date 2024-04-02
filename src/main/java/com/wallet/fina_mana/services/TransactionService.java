@@ -71,17 +71,60 @@ public class TransactionService implements ITransactionService{
     }
 
     @Override
-    public List<Transaction> getTransactionInWalletByType(long walletId, boolean type) throws Exception {
-        return null;
+    public List<TransactionResponse> getAllTransactionsByUser(long userId) throws Exception {
+        return transactionRepository.findByWallet_UserIdAndActive(userId, true)
+                .stream().map(transaction -> TransactionResponse.builder()
+                        .id(transaction.getId())
+                        .amount(transaction.getAmount())
+                        .time(transaction.getTime())
+                        .description(transaction.getDescription())
+                        .type(transaction.isType() ? "Income" : "Outcome")
+                        .catgoryName(transaction.getCategory().getName())
+                        .walletName(transaction.getWallet().getName())
+                        .build())
+                .toList();
+    }
+
+
+    @Override
+    public List<TransactionResponse> getTransactionInWalletByType(long userId, long walletId, boolean type) throws Exception {
+        Wallet wallet = walletRepository.findByUserIdAndIdAndActive(userId, walletId, true)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find wallet: " + walletId));
+
+        return transactionRepository.findByWalletIdAndTypeAndActive(walletId, type, true)
+                .stream().map(transaction -> TransactionResponse.builder()
+                        .id(transaction.getId())
+                        .amount(transaction.getAmount())
+                        .time(transaction.getTime())
+                        .description(transaction.getDescription())
+                        .type(transaction.isType() ? "Income" : "Outcome")
+                        .catgoryName(transaction.getCategory().getName())
+                        .walletName(transaction.getWallet().getName())
+                        .build())
+                .toList();
     }
 
     @Override
-    public Transaction updateTransaction(long id, TransactionDTO transactionDTO) throws Exception {
-        return null;
+    public Transaction updateTransaction(long[] userId, long id, TransactionDTO transactionDTO, boolean type) throws Exception {
+        Wallet wallet = walletRepository.findByUserIdAndIdAndActive( userId[1], transactionDTO.getWalletId(),true)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find wallet: " + transactionDTO.getWalletId()));
+        Category category = categoryRepository.findByUserIdAndIdAndTypeLaun(userId, transactionDTO.getCategoryId(), type)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find category: " + transactionDTO.getCategoryId()));
+        Transaction transaction = transactionRepository.findByIdAndWallet_UserIdAndActiveAndType(id, userId[1], true , type)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find transaction: " + id));
+        transaction.setAmount(transactionDTO.getAmount());
+        transaction.setDescription(transaction.getDescription());
+        transaction.setTime(transactionDTO.getTime());
+        transaction.setCategory(category);
+        transaction.setWallet(wallet);
+
+        return transactionRepository.save(transaction);
     }
 
     @Override
-    public void deleteTransaction(long id) throws Exception {
-
+    public void deleteTransaction(long userId, long id, boolean type) throws Exception {
+        Transaction transaction = transactionRepository.findByIdAndWallet_UserIdAndActiveAndType(id, userId, true, type)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find transaction: " + id));
+        transaction.setActive(false);
     }
 }

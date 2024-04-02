@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -20,7 +21,7 @@ public class TransactionDTO {
     private String description;
 
     @JsonProperty("time")
-    private Date time;
+    private LocalDateTime time;
 
     @Min(value = 1, message = "Wallet ID must be > 0")
     @JsonProperty("wallet_id")
