@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -112,12 +113,49 @@ public class TransactionService implements ITransactionService{
                 .orElseThrow(() -> new DataNotFoundException("Cannot find category: " + transactionDTO.getCategoryId()));
         Transaction transaction = transactionRepository.findByIdAndWallet_UserIdAndActiveAndType(id, userId[1], true , type)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find transaction: " + id));
+        float oldAmount = Float.parseFloat(transaction.getAmount());
+        float newAmount = Float.parseFloat(transactionDTO.getAmount());
+        float moneyInWallet = Float.parseFloat(wallet.getMoney());
+        // Trong trường hợp không đổi ví
+        if (Objects.equals(wallet.getId(), transaction.getWallet().getId())) {
+            // Type = income
+            if (type){
+                moneyInWallet += (newAmount - oldAmount);
+                wallet.setMoney(Float.toString(moneyInWallet));
+            }
+            // Type = outcome
+            else {
+                moneyInWallet -= (newAmount - oldAmount);
+                wallet.setMoney(Float.toString(moneyInWallet));
+            }
+        }
+        // Trong trường hợp đổi ví
+        else {
+            Wallet oldWallet = walletRepository.findByUserIdAndIdAndActive( userId[1], transaction.getWallet().getId(),true)
+                    .orElseThrow(() -> new DataNotFoundException("Cannot find wallet: " + transaction.getWallet().getId()));
+            float moneyInOld = Float.parseFloat(oldWallet.getMoney());
+            if (type){
+                moneyInOld -= oldAmount;
+                oldWallet.setMoney(Float.toString(moneyInOld));
+                moneyInWallet += newAmount;
+                wallet.setMoney(Float.toString(moneyInWallet));
+            }
+            // Type = outcome
+            else {
+                moneyInOld += oldAmount;
+                oldWallet.setMoney(Float.toString(moneyInOld));
+                moneyInWallet -= newAmount;
+                wallet.setMoney(Float.toString(moneyInWallet));
+            }
+            walletRepository.save(oldWallet);
+        }
         transaction.setAmount(transactionDTO.getAmount());
         transaction.setDescription(transaction.getDescription());
         transaction.setTime(transactionDTO.getTime());
         transaction.setCategory(category);
         transaction.setWallet(wallet);
 
+        walletRepository.save(wallet);
         return transactionRepository.save(transaction);
     }
 
@@ -125,6 +163,22 @@ public class TransactionService implements ITransactionService{
     public void deleteTransaction(long userId, long id, boolean type) throws Exception {
         Transaction transaction = transactionRepository.findByIdAndWallet_UserIdAndActiveAndType(id, userId, true, type)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find transaction: " + id));
+        Wallet wallet = walletRepository.findByUserIdAndIdAndActive( userId, transaction.getWallet().getId(),true)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find wallet: " + transaction.getWallet().getId()));
+        float oldAmount = Float.parseFloat(transaction.getAmount());
+        float moneyInWallet = Float.parseFloat(wallet.getMoney());
+        // Type = income
+        if (type){
+            moneyInWallet -= oldAmount;
+            wallet.setMoney(Float.toString(moneyInWallet));
+        }
+        // Type = outcome
+        else {
+            moneyInWallet += oldAmount;
+            wallet.setMoney(Float.toString(moneyInWallet));
+        }
+        walletRepository.save(wallet);
         transaction.setActive(false);
+        transactionRepository.save(transaction);
     }
 }
