@@ -16,3 +16,6 @@ spring:
       dialect: org.hibernate.dialect.MySQL8Dialect
 api:
   prefix: api/v1
+jwt:
+  expiration: 2592000
+  secretKey: I have a apple
