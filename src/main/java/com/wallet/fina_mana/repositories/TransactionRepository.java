@@ -10,6 +10,9 @@ import java.util.Optional;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findByWalletIdAndActive(long walletId, boolean active);
 
+    List<Transaction> findByWalletId(long walletId);
+
+
     List<Transaction> findByWalletIdAndTypeAndActive(long walletId, boolean type, boolean active);
 
     List<Transaction> findByWallet_UserIdAndActive(Long wallet_user_id, boolean active);

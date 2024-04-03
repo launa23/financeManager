@@ -2,8 +2,10 @@ package com.wallet.fina_mana.services;
 
 import com.wallet.fina_mana.Exceptions.DataNotFoundException;
 import com.wallet.fina_mana.dtos.WalletDTO;
+import com.wallet.fina_mana.models.Transaction;
 import com.wallet.fina_mana.models.User;
 import com.wallet.fina_mana.models.Wallet;
+import com.wallet.fina_mana.repositories.TransactionRepository;
 import com.wallet.fina_mana.repositories.UserRepository;
 import com.wallet.fina_mana.repositories.WalletRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import java.util.List;
 public class WalletService implements IWalletService{
     private final UserRepository userRepository;
     private final WalletRepository walletRepository;
+    private final TransactionRepository transactionRepository;
     @Override
     public Wallet createWallet(WalletDTO walletDTO) throws Exception {
         User user = userRepository.findById(walletDTO.getUserId())
@@ -57,9 +60,14 @@ public class WalletService implements IWalletService{
 
     @Override
     public void deleteWallet(long id) throws DataNotFoundException {
+        // Xóa cứng, xóa ví thì sẽ xoá luôn giao dịch trong ví
         Wallet existingWallet = walletRepository.findByIdAndActive(id, true)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find wallet id: " + id));
-        existingWallet.setActive(false);
-        walletRepository.save(existingWallet);
+        List<Transaction> transactionList = transactionRepository.findByWalletId(id);
+        if (!transactionList.isEmpty()){
+            transactionRepository.deleteAllInBatch(transactionList);
+        }
+//        existingWallet.setActive(false);
+        walletRepository.delete(existingWallet);
     }
 }
