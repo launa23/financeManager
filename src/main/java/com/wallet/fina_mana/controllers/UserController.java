@@ -2,7 +2,9 @@ package com.wallet.fina_mana.controllers;
 
 import com.wallet.fina_mana.dtos.UserDTO;
 import com.wallet.fina_mana.dtos.UserLoginDTO;
+import com.wallet.fina_mana.services.UserService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -14,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("${api.prefix}/user")
 public class UserController {
+    private final UserService userService;
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO, BindingResult  result){
         try {
@@ -26,6 +30,7 @@ public class UserController {
             if (!userDTO.getPassword().equals(userDTO.getRetypePassword())){
                 return ResponseEntity.badRequest().body("Password does not match!");
             }
+            userService.createUser(userDTO);
             return ResponseEntity.ok("Register sucessfully!");
         }
         catch (Exception e){
@@ -35,6 +40,12 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody UserLoginDTO userLoginDTO){
-        return ResponseEntity.ok("Login sucessfully!");
+        try {
+            String token = userService.login(userLoginDTO.getUsername(), userLoginDTO.getPassword());
+            return ResponseEntity.ok(token);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

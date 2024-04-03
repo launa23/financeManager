@@ -18,4 +18,4 @@ api:
   prefix: api/v1
 jwt:
   expiration: 2592000
-  secretKey: I have a apple
+  secretKey: OJd3+enSUenPVIIVVRHLo55UKObjfWXF1mi1lzby2/A=

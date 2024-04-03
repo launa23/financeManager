@@ -30,6 +30,7 @@ public class JwtTokenUtil {
     private String secretKey;
     public String generateToken(com.wallet.fina_mana.models.User user){
         Map<String, Object> claims = new HashMap<>();
+//        this.generateSecretKey();
         claims.put("username", user.getUsername());
         try {
             String token = Jwts.builder()
