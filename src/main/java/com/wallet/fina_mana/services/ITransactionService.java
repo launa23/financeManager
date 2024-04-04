@@ -14,6 +14,8 @@ public interface ITransactionService {
 
     List<TransactionResponse> getAllTransactionsByUser(long userId) throws Exception;
 
+    List<TransactionResponse> getAllTransactionsByUserAndType(long userId, boolean type) throws Exception;
+
     List<TransactionResponse> getTransactionInWalletByType(long userId, long walletId, boolean type) throws Exception;
 
     Transaction updateTransaction(long[] userId, long id, TransactionDTO transactionDTO, boolean type) throws Exception;

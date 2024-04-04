@@ -95,11 +95,11 @@ public class CategoryService implements ICategoryService{
     }
 
     @Override
-    public Category updateCategoryById(long userId, long id, CategoryDTO categoryDTO, boolean type) throws Exception {
-        Category category = categoryRepository.findByIdAndUserId(id, userId)
+    public Category updateCategoryById(long[] userId, long id, CategoryDTO categoryDTO, boolean type) throws Exception {
+        Category category = categoryRepository.findByIdAndUserIdAndType(id, userId[1], type)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find category: " + id));
 
-        if (categoryRepository.findDifferentIdAndSameName(id, categoryDTO.getName(), true) != null){
+        if (categoryRepository.findDifferentIdAndSameName(id, categoryDTO.getName(), true, userId) != null){
             throw new Exception("Category is already exist");
         }
         category.setName(categoryDTO.getName());
@@ -114,7 +114,7 @@ public class CategoryService implements ICategoryService{
         }
         else{
             Category categoryParent = categoryRepository
-                    .findByIdAndActiveAndType(Long.parseLong(categoryDTO.getParentId()), true, type)
+                    .findByParentId(userId, type, Long.parseLong(categoryDTO.getParentId()))
                     .orElseThrow(() -> new DataNotFoundException("Cannot find category parent: " + categoryDTO.getParentId()));
 
             Optional<CategoryHierarchy> categoryHierarchy = Optional.ofNullable(categoryHierarchyRepository.findChildExistInHierarchy(id));

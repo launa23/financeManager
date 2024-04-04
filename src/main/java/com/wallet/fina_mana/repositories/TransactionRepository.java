@@ -12,6 +12,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findByWalletId(long walletId);
 
+    List<Transaction> findByWallet_UserIdAndTypeAndActive(long userId, boolean type, boolean active);
 
     List<Transaction> findByWalletIdAndTypeAndActive(long walletId, boolean type, boolean active);
 

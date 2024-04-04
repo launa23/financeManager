@@ -17,7 +17,7 @@ public interface ICategoryService {
 
     List<CategoryResponse> getAllCategoryByType(long[] userId, boolean type) throws Exception;
 
-    Category updateCategoryById(long userId, long id, CategoryDTO categoryDTO, boolean type) throws Exception;
+    Category updateCategoryById(long[] userId, long id, CategoryDTO categoryDTO, boolean type) throws Exception;
 
     void deleteCategory(long id, long[] userId, boolean type) throws DataNotFoundException;
 

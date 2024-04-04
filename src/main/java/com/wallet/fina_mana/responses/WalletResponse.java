@@ -13,5 +13,5 @@ public class WalletResponse {
     private String name;
     private String icon;
     private String money;
-    private long userId;
+//    private long userId;
 }

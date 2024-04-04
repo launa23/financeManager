@@ -4,6 +4,8 @@ import com.wallet.fina_mana.dtos.TransactionDTO;
 import com.wallet.fina_mana.models.Transaction;
 import com.wallet.fina_mana.responses.TransactionResponse;
 import com.wallet.fina_mana.services.TransactionService;
+import com.wallet.fina_mana.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
@@ -19,17 +21,19 @@ import java.util.List;
 @RequestMapping("${api.prefix}/transaction")
 public class TransactionController {
     private final TransactionService transactionService;
-
+    private final UserService userService;
     @PostMapping("/create/{type}")
     public ResponseEntity<?> createTransaction(@PathVariable("type") String type,
                                                @Valid @RequestBody TransactionDTO transactionDTO,
+                                               HttpServletRequest request,
                                                BindingResult result){
         try {
             if (result.hasErrors()){
                 List<String> errorMess = result.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
                 return ResponseEntity.badRequest().body(errorMess);
             }
-            long[] userIds = new long[]{0, 1};
+            long userId = userService.getCurrent(request).getId();
+            long[] userIds = new long[]{0, userId};
             boolean typeBoolean = type.equals("income");
 
             Transaction transaction = transactionService.createTransaction(userIds, transactionDTO, typeBoolean);
@@ -51,9 +55,11 @@ public class TransactionController {
     }
 
     @GetMapping("/wallet/{walletId}")
-    public ResponseEntity<?> getTransactionInWallet(@PathVariable("walletId") long walletId){
+    public ResponseEntity<?> getTransactionInWallet(@PathVariable("walletId") long walletId,
+                                                    HttpServletRequest request){
         try {
-            long[] userIds = new long[]{0, 1};
+            long userId = userService.getCurrent(request).getId();
+            long[] userIds = new long[]{0, userId};
             List<TransactionResponse> transactionResponses = transactionService.getAllTransactionsInWallet(userIds, walletId);
             return ResponseEntity.ok(transactionResponses);
         }
@@ -64,10 +70,10 @@ public class TransactionController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllTransaction(){
+    public ResponseEntity<?> getAllTransaction(HttpServletRequest request){
         try {
-            long[] userIds = new long[]{0, 1};
-            List<TransactionResponse> transactionResponses = transactionService.getAllTransactionsByUser(userIds[1]);
+            long userId = userService.getCurrent(request).getId();
+            List<TransactionResponse> transactionResponses = transactionService.getAllTransactionsByUser(userId);
             return ResponseEntity.ok(transactionResponses);
         }
         catch (Exception e){
@@ -76,15 +82,26 @@ public class TransactionController {
     }
 
     @GetMapping("/{type}")
-    public ResponseEntity<?> getTransactionByType(@PathVariable("type") String type){
-        return ResponseEntity.ok("Lấy ra các giao dịch theo loại");
+    public ResponseEntity<?> getTransactionByType(@PathVariable("type") String type,
+                                                  HttpServletRequest request){
+        try {
+            long userId = userService.getCurrent(request).getId();
+            boolean typeBoolean = type.equals("income");
+            List<TransactionResponse> transactionResponses = transactionService.getAllTransactionsByUserAndType(userId, typeBoolean);
+            return ResponseEntity.ok(transactionResponses);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/wallet/{walletId}/{type}")
     public ResponseEntity<?> getTransactionById(@PathVariable("type") String type,
-                                                @PathVariable("walletId") long walletId){
+                                                @PathVariable("walletId") long walletId,
+                                                HttpServletRequest request){
         try {
-            long[] userIds = new long[]{0, 1};
+            long userId = userService.getCurrent(request).getId();
+            long[] userIds = new long[]{0, userId};
             boolean typeBoolean = type.equals("income");
 
             List<TransactionResponse> transactionResponses = transactionService.getTransactionInWalletByType(userIds[1], walletId, typeBoolean);
@@ -100,13 +117,15 @@ public class TransactionController {
     public ResponseEntity<?> updateTransaction(@PathVariable("id") long id,
                                                @PathVariable("type") String type,
                                                @Valid @RequestBody TransactionDTO transactionDTO,
+                                               HttpServletRequest request,
                                                BindingResult result){
         try {
             if (result.hasErrors()){
                 List<String> errorMess = result.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
                 return ResponseEntity.badRequest().body(errorMess);
             }
-            long[] userIds = new long[]{0, 1};
+            long userId = userService.getCurrent(request).getId();
+            long[] userIds = new long[]{0, userId};
             boolean typeBoolean = type.equals("income");
 
             Transaction transaction = transactionService.updateTransaction(userIds, id, transactionDTO, typeBoolean);
@@ -129,12 +148,13 @@ public class TransactionController {
 
     @PutMapping("delete/{type}/{id}")
     public ResponseEntity<?> deleteTransaction(@PathVariable("id") long id,
-                                               @PathVariable("type") String type){
+                                               @PathVariable("type") String type,
+                                               HttpServletRequest request){
         try {
-            long[] userIds = new long[]{0, 1};
+            long userId = userService.getCurrent(request).getId();
             boolean typeBoolean = type.equals("income");
 
-            transactionService.deleteTransaction(userIds[1], id, typeBoolean);
+            transactionService.deleteTransaction(userId, id, typeBoolean);
             return ResponseEntity.ok("Xóa thành công: " + id);
 
         } catch (Exception e) {

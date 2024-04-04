@@ -20,9 +20,7 @@ public class WalletService implements IWalletService{
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository;
     @Override
-    public Wallet createWallet(WalletDTO walletDTO) throws Exception {
-        User user = userRepository.findById(walletDTO.getUserId())
-                .orElseThrow(() -> new DataNotFoundException("Cannot find user id: " + walletDTO.getUserId()));
+    public Wallet createWallet(WalletDTO walletDTO, User user) throws Exception {
         if (walletRepository.existsByUserIdAndNameAndActive(user.getId(), walletDTO.getName(), true)){
             throw new Exception("Wallet's name is already exist");
         }
@@ -37,10 +35,9 @@ public class WalletService implements IWalletService{
     }
 
     @Override
-    public Wallet getWalletById(long id) throws DataNotFoundException {
-        Wallet existingWallet = walletRepository.findByIdAndActive(id, true)
+    public Wallet getWalletById(long id, long userId) throws DataNotFoundException {
+        return walletRepository.findByIdAndUserIdAndActive(id, userId,  true)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find wallet id: " + id));
-        return existingWallet;
     }
 
     @Override
@@ -49,8 +46,8 @@ public class WalletService implements IWalletService{
     }
 
     @Override
-    public Wallet updateWallet(long id, WalletDTO walletDTO) throws DataNotFoundException {
-        Wallet existingWallet = walletRepository.findByIdAndActive(id, true)
+    public Wallet updateWallet(long id, WalletDTO walletDTO, long userId) throws DataNotFoundException {
+        Wallet existingWallet = walletRepository.findByIdAndUserIdAndActive(id, userId, true)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find wallet id: " + id));
         existingWallet.setName(walletDTO.getName());
         existingWallet.setIcon(walletDTO.getIcon());
@@ -59,9 +56,9 @@ public class WalletService implements IWalletService{
     }
 
     @Override
-    public void deleteWallet(long id) throws DataNotFoundException {
+    public void deleteWallet(long id, long userId) throws DataNotFoundException {
         // Xóa cứng, xóa ví thì sẽ xoá luôn giao dịch trong ví
-        Wallet existingWallet = walletRepository.findByIdAndActive(id, true)
+        Wallet existingWallet = walletRepository.findByIdAndUserIdAndActive(id, userId, true)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find wallet id: " + id));
         List<Transaction> transactionList = transactionRepository.findByWalletId(id);
         if (!transactionList.isEmpty()){

@@ -86,6 +86,21 @@ public class TransactionService implements ITransactionService{
                 .toList();
     }
 
+    @Override
+    public List<TransactionResponse> getAllTransactionsByUserAndType(long userId, boolean type) throws Exception {
+        return transactionRepository.findByWallet_UserIdAndTypeAndActive(userId, type, true)
+                .stream().map(transaction -> TransactionResponse.builder()
+                        .id(transaction.getId())
+                        .amount(transaction.getAmount())
+                        .time(transaction.getTime())
+                        .description(transaction.getDescription())
+                        .type(transaction.isType() ? "Income" : "Outcome")
+                        .catgoryName(transaction.getCategory().getName())
+                        .walletName(transaction.getWallet().getName())
+                        .build())
+                .toList();
+    }
+
 
     @Override
     public List<TransactionResponse> getTransactionInWalletByType(long userId, long walletId, boolean type) throws Exception {
@@ -107,12 +122,13 @@ public class TransactionService implements ITransactionService{
 
     @Override
     public Transaction updateTransaction(long[] userId, long id, TransactionDTO transactionDTO, boolean type) throws Exception {
+        Transaction transaction = transactionRepository.findByIdAndWallet_UserIdAndActiveAndType(id, userId[1], true , type)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find transaction: " + id));
         Wallet wallet = walletRepository.findByUserIdAndIdAndActive( userId[1], transactionDTO.getWalletId(),true)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find wallet: " + transactionDTO.getWalletId()));
         Category category = categoryRepository.findByUserIdAndIdAndTypeLaun(userId, transactionDTO.getCategoryId(), type)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find category: " + transactionDTO.getCategoryId()));
-        Transaction transaction = transactionRepository.findByIdAndWallet_UserIdAndActiveAndType(id, userId[1], true , type)
-                .orElseThrow(() -> new DataNotFoundException("Cannot find transaction: " + id));
+
         float oldAmount = Float.parseFloat(transaction.getAmount());
         float newAmount = Float.parseFloat(transactionDTO.getAmount());
         float moneyInWallet = Float.parseFloat(wallet.getMoney());

@@ -13,6 +13,7 @@ public interface WalletRepository extends JpaRepository<Wallet, Long> {
 
     Optional<Wallet> findByIdAndActive(long id, boolean active);
 
+    Optional<Wallet> findByIdAndUserIdAndActive(long id, long userId, boolean active);
 
     Optional<Wallet> findByNameAndActive(String name, boolean active);
 

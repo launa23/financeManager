@@ -24,6 +24,6 @@ public class WalletDTO {
     @JsonProperty("icon")
     private String icon;
 
-    @JsonProperty("user_id")
-    private long userId;
+//    @JsonProperty("user_id")
+//    private long userId;
 }

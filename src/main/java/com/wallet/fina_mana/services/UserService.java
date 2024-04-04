@@ -5,6 +5,8 @@ import com.wallet.fina_mana.components.JwtTokenUtil;
 import com.wallet.fina_mana.dtos.UserDTO;
 import com.wallet.fina_mana.models.User;
 import com.wallet.fina_mana.repositories.UserRepository;
+import com.wallet.fina_mana.responses.UserResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,5 +61,16 @@ public class UserService implements IUserService{
         );
         authenticationManager.authenticate(authenticationToken);
         return jwtTokenUtil.generateToken(existingUser);
+    }
+
+    @Override
+    public User getCurrent(HttpServletRequest request) throws Exception {
+        String authenHeader = request.getHeader("Authorization");
+        final String token = authenHeader.substring(7);         // cắt bỏ chữ "Bearer " trong chuỗi bearer token để lấy token
+        final String username = jwtTokenUtil.extractUsername(token);
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find user"));
+
     }
 }
