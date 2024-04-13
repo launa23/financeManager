@@ -14,9 +14,10 @@ import java.util.Date;
 public class TransactionResponse {
     private long id;
     private String amount;
+    private String image;
     private String description;
     private LocalDateTime time;
     private String type;
-    private String catgoryName;
+    private String categoryName;
     private String walletName;
 }

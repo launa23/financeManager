@@ -8,12 +8,13 @@ import com.wallet.fina_mana.models.Wallet;
 import com.wallet.fina_mana.repositories.CategoryRepository;
 import com.wallet.fina_mana.repositories.TransactionRepository;
 import com.wallet.fina_mana.repositories.WalletRepository;
+import com.wallet.fina_mana.responses.TransByDateResponse;
 import com.wallet.fina_mana.responses.TransactionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -61,10 +62,11 @@ public class TransactionService implements ITransactionService{
                 .stream().map(transaction -> TransactionResponse.builder()
                         .id(transaction.getId())
                         .amount(transaction.getAmount())
+                        .image(transaction.getCategory().getIcon())
                         .time(transaction.getTime())
                         .description(transaction.getDescription())
                         .type(transaction.isType() ? "Income" : "Outcome")
-                        .catgoryName(transaction.getCategory().getName())
+                        .categoryName(transaction.getCategory().getName())
                         .walletName(transaction.getWallet().getName())
                         .build())
                 .toList();
@@ -77,10 +79,11 @@ public class TransactionService implements ITransactionService{
                 .stream().map(transaction -> TransactionResponse.builder()
                         .id(transaction.getId())
                         .amount(transaction.getAmount())
+                        .image(transaction.getCategory().getIcon())
                         .time(transaction.getTime())
                         .description(transaction.getDescription())
                         .type(transaction.isType() ? "Income" : "Outcome")
-                        .catgoryName(transaction.getCategory().getName())
+                        .categoryName(transaction.getCategory().getName())
                         .walletName(transaction.getWallet().getName())
                         .build())
                 .toList();
@@ -92,10 +95,11 @@ public class TransactionService implements ITransactionService{
                 .stream().map(transaction -> TransactionResponse.builder()
                         .id(transaction.getId())
                         .amount(transaction.getAmount())
+                        .image(transaction.getCategory().getIcon())
                         .time(transaction.getTime())
                         .description(transaction.getDescription())
                         .type(transaction.isType() ? "Income" : "Outcome")
-                        .catgoryName(transaction.getCategory().getName())
+                        .categoryName(transaction.getCategory().getName())
                         .walletName(transaction.getWallet().getName())
                         .build())
                 .toList();
@@ -111,10 +115,11 @@ public class TransactionService implements ITransactionService{
                 .stream().map(transaction -> TransactionResponse.builder()
                         .id(transaction.getId())
                         .amount(transaction.getAmount())
+                        .image(transaction.getCategory().getIcon())
                         .time(transaction.getTime())
                         .description(transaction.getDescription())
                         .type(transaction.isType() ? "Income" : "Outcome")
-                        .catgoryName(transaction.getCategory().getName())
+                        .categoryName(transaction.getCategory().getName())
                         .walletName(transaction.getWallet().getName())
                         .build())
                 .toList();
@@ -176,6 +181,69 @@ public class TransactionService implements ITransactionService{
     }
 
     @Override
+    public List<TransByDateResponse> getByMonthAndYear(long userId, int month, int year, long walletId) throws Exception {
+        List<TransactionResponse> transactions = transactionRepository.findByMonthAndYear(month, year, userId, walletId)
+                .stream().map(transaction -> TransactionResponse.builder()
+                        .id(transaction.getId())
+                        .amount(transaction.getAmount())
+                        .image(transaction.getCategory().getIcon())
+                        .time(transaction.getTime())
+                        .description(transaction.getDescription())
+                        .type(transaction.isType() ? "Income" : "Outcome")
+                        .categoryName(transaction.getCategory().getName())
+                        .walletName(transaction.getWallet().getName())
+                        .build())
+                .toList();;
+        List<TransByDateResponse> transByDateResponses = new ArrayList<>();
+
+        for (TransactionResponse tr : transactions) {
+            String date = tr.getTime().toString().substring(0, 10);
+            if (transByDateResponses.isEmpty()){
+                List<TransactionResponse> transactionResponses = new ArrayList<>();
+                transactionResponses.add(tr);
+                transByDateResponses.add(new TransByDateResponse(date, transactionResponses));
+            }
+            else {
+                int flag = 0;
+                for (TransByDateResponse trdr: transByDateResponses) {
+                    if (date.equals(trdr.getTime())){
+                        trdr.getTransactionResponseList().add(tr);
+                        flag = 1;
+                        break;
+                    }
+                }
+                if (flag == 0){
+                    List<TransactionResponse> transactionResponses = new ArrayList<>();
+                    transactionResponses.add(tr);
+                    transByDateResponses.add(new TransByDateResponse(date, transactionResponses));
+                }
+            }
+        }
+
+        return transByDateResponses;
+    }
+
+    @Override
+    public Map<String, String> getTotalIncomeAndOutcome(long userId, int month, int year, long walletId) throws Exception {
+        List<Transaction> transactions = transactionRepository.findByMonthAndYear(month, year, userId, walletId);
+        Map<String, String> result = new HashMap<>();
+        long ic = 0, oc = 0, tt;
+        for (Transaction tr : transactions) {
+            if (tr.isType()){
+                ic += Long.parseLong(tr.getAmount());
+            }
+            else {
+                oc += Long.parseLong(tr.getAmount());
+            }
+        }
+        result.put("Income", String.valueOf(ic));
+        result.put("Outcome", String.valueOf(oc));
+        result.put("Total", String.valueOf(ic-oc));
+
+        return result;
+    }
+
+    @Override
     public void deleteTransaction(long userId, long id, boolean type) throws Exception {
         Transaction transaction = transactionRepository.findByIdAndWallet_UserIdAndActiveAndType(id, userId, true, type)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find transaction: " + id));
@@ -197,4 +265,5 @@ public class TransactionService implements ITransactionService{
         transaction.setActive(false);
         transactionRepository.save(transaction);
     }
+
 }

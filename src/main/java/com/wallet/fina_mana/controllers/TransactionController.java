@@ -2,6 +2,7 @@ package com.wallet.fina_mana.controllers;
 
 import com.wallet.fina_mana.dtos.TransactionDTO;
 import com.wallet.fina_mana.models.Transaction;
+import com.wallet.fina_mana.responses.TransByDateResponse;
 import com.wallet.fina_mana.responses.TransactionResponse;
 import com.wallet.fina_mana.services.TransactionService;
 import com.wallet.fina_mana.services.UserService;
@@ -14,7 +15,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,7 +46,7 @@ public class TransactionController {
                     .time(transaction.getTime())
                     .description(transaction.getDescription())
                     .type(transaction.isType() ? "Income" : "Outcome")
-                    .catgoryName(transaction.getCategory().getName())
+                    .categoryName(transaction.getCategory().getName())
                     .walletName(transaction.getWallet().getName())
                     .build();
             return ResponseEntity.ok(transactionResponse);
@@ -95,6 +98,38 @@ public class TransactionController {
         }
     }
 
+    @GetMapping("/monthandyear")
+    public ResponseEntity<?> getTransactionByMonthAndYear(
+                                                  @RequestParam(value = "month") int month,
+                                                  @RequestParam("year") int year,
+                                                  @RequestParam("walletId") long walletId,
+                                                  HttpServletRequest request){
+        try {
+            long userId = userService.getCurrent(request).getId();
+            List<TransByDateResponse> transactionResponses = transactionService.getByMonthAndYear(userId, month, year, walletId);
+            return ResponseEntity.ok(transactionResponses);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/total")
+    public ResponseEntity<?> getTotalIncomeAndOutcomeInMonth(
+            @RequestParam("month") int month,
+            @RequestParam("year") int year,
+            @RequestParam("walletId") long walletId,
+            HttpServletRequest request){
+        try {
+            long userId = userService.getCurrent(request).getId();
+            Map<String, String> transactionResponses = transactionService.getTotalIncomeAndOutcome(userId, month, year, walletId);
+            return ResponseEntity.ok(transactionResponses);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/wallet/{walletId}/{type}")
     public ResponseEntity<?> getTransactionById(@PathVariable("type") String type,
                                                 @PathVariable("walletId") long walletId,
@@ -135,7 +170,7 @@ public class TransactionController {
                     .time(transaction.getTime())
                     .description(transaction.getDescription())
                     .type(transaction.isType() ? "Income" : "Outcome")
-                    .catgoryName(transaction.getCategory().getName())
+                    .categoryName(transaction.getCategory().getName())
                     .walletName(transaction.getWallet().getName())
                     .build();
             return ResponseEntity.ok(transactionResponse);
