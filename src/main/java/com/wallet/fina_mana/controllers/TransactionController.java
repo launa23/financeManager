@@ -46,6 +46,7 @@ public class TransactionController {
                     .time(transaction.getTime())
                     .description(transaction.getDescription())
                     .type(transaction.isType() ? "Income" : "Outcome")
+                    .image(transaction.getCategory().getIcon())
                     .categoryName(transaction.getCategory().getName())
                     .walletName(transaction.getWallet().getName())
                     .build();
@@ -170,6 +171,7 @@ public class TransactionController {
                     .time(transaction.getTime())
                     .description(transaction.getDescription())
                     .type(transaction.isType() ? "Income" : "Outcome")
+                    .image(transaction.getCategory().getIcon())
                     .categoryName(transaction.getCategory().getName())
                     .walletName(transaction.getWallet().getName())
                     .build();
