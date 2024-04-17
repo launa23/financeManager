@@ -58,7 +58,7 @@ public class TransactionService implements ITransactionService{
     public List<TransactionResponse> getAllTransactionsInWallet(long[] userId, long walletId) throws Exception {
         Wallet wallet = walletRepository.findByUserIdAndIdAndActive(userId[1], walletId, true)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find wallet: " + walletId));
-        List<TransactionResponse> transactions = transactionRepository.findByWalletIdAndActive(walletId, true)
+        List<TransactionResponse> transactions = transactionRepository.findByWalletIdAndActiveOrderByTimeDesc(walletId, true)
                 .stream().map(transaction -> TransactionResponse.builder()
                         .id(transaction.getId())
                         .amount(transaction.getAmount())
@@ -186,8 +186,18 @@ public class TransactionService implements ITransactionService{
 
     @Override
     public List<TransByDateResponse> getByMonthAndYear(long userId, int month, int year, long walletId) throws Exception {
-        List<TransactionResponse> transactions = transactionRepository.findByMonthAndYear(month, year, userId, walletId)
-                .stream().map(transaction -> TransactionResponse.builder()
+        List<Transaction> trans = new ArrayList<>();
+        if(month != 0 && year != 0){
+            trans = transactionRepository.findByMonthAndYear(month, year, userId, walletId);
+        }
+        else if (month == 0 && year != 0){
+            trans = transactionRepository.findByYear(year, userId, walletId);
+        }
+        else{
+            trans = transactionRepository.findByWalletIdAndActiveOrderByTimeDesc(walletId, true);
+        }
+        List<TransactionResponse> transactions = trans.stream()
+                .map(transaction -> TransactionResponse.builder()
                         .id(transaction.getId())
                         .amount(transaction.getAmount())
                         .image(transaction.getCategory().getIcon())
@@ -230,10 +240,19 @@ public class TransactionService implements ITransactionService{
 
     @Override
     public Map<String, String> getTotalIncomeAndOutcome(long userId, int month, int year, long walletId) throws Exception {
-        List<Transaction> transactions = transactionRepository.findByMonthAndYear(month, year, userId, walletId);
+        List<Transaction> trans = new ArrayList<>();
+        if(month != 0 && year != 0){
+            trans = transactionRepository.findByMonthAndYear(month, year, userId, walletId);
+        }
+        else if (month == 0 && year != 0){
+            trans = transactionRepository.findByYear(year, userId, walletId);
+        }
+        else{
+            trans = transactionRepository.findByWalletIdAndActiveOrderByTimeDesc(walletId, true);
+        }
         Map<String, String> result = new HashMap<>();
-        long ic = 0, oc = 0, tt;
-        for (Transaction tr : transactions) {
+        long ic = 0, oc = 0;
+        for (Transaction tr : trans) {
             if (tr.isType()){
                 ic += Long.parseLong(tr.getAmount());
             }

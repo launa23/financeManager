@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-    List<Transaction> findByWalletIdAndActive(long walletId, boolean active);
+    List<Transaction> findByWalletIdAndActiveOrderByTimeDesc(long walletId, boolean active);
 
     List<Transaction> findByWalletId(long walletId);
 
@@ -25,4 +25,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query(value = "select tr.* from transactions as tr inner join wallets as w on w.id = tr.wallet_id" +
             " where w.user_id = :user_id and tr.wallet_id = :wallet_id and MONTH(tr.time) = :month and YEAR(tr.time) = :year and tr.active = 1 order by tr.time desc", nativeQuery = true)
     List<Transaction> findByMonthAndYear(@Param("month") int month, @Param("year") int year, @Param("user_id") long user_id, @Param("wallet_id") long walletId);
+    @Query(value = "select tr.* from transactions as tr inner join wallets as w on w.id = tr.wallet_id" +
+            " where w.user_id = :user_id and tr.wallet_id = :wallet_id and YEAR(tr.time) = :year and tr.active = 1 order by tr.time desc", nativeQuery = true)
+    List<Transaction> findByYear(@Param("year") int year, @Param("user_id") long user_id, @Param("wallet_id") long walletId);
+
 }
