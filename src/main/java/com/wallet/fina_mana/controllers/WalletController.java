@@ -60,13 +60,29 @@ public class WalletController {
                             .money(wallet.getMoney())
                             .icon(wallet.getIcon())
                             .build()).toList();
-            return ResponseEntity.ok(!walletResponses.isEmpty() ? walletResponses : "Bạn chưa có ví nào!");
+            return ResponseEntity.ok(!walletResponses.isEmpty() ? walletResponses : "you don't have a wallet!");
         }
         catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
-
         }
+    }
 
+    @GetMapping("/first")
+    public ResponseEntity<?> getFirstWallet(HttpServletRequest request){
+        try {
+            long userId = userService.getCurrent(request).getId();
+            Wallet wallet = walletService.getFirstWalletByUserId(userId);
+            WalletResponse walletResponse = WalletResponse.builder()
+                    .id(wallet.getId())
+                    .name(wallet.getName())
+                    .money(wallet.getMoney())
+                    .icon(wallet.getIcon())
+                    .build();
+            return ResponseEntity.ok(walletResponse);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")

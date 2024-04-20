@@ -41,6 +41,12 @@ public class WalletService implements IWalletService{
     }
 
     @Override
+    public Wallet getFirstWalletByUserId(long userId) throws DataNotFoundException {
+        return walletRepository.findFirstByUserId(userId)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find wallet!"));
+    }
+
+    @Override
     public List<Wallet> getAllWallets(long userId) {
         return walletRepository.findByUserIdAndActive(userId, true);
     }

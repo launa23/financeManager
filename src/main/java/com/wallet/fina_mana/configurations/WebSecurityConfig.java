@@ -37,7 +37,7 @@ public class WebSecurityConfig {
                                     String.format("%s/user/login", apiPrefix)
                     ).permitAll()
 //                            .requestMatchers(HttpMethod.GET,
-//                                    String.format("%s/transaction/**", apiPrefix)).authenticated()
+//                                    String.format("%s/t ransaction/**", apiPrefix)).authenticated()
                             .anyRequest().authenticated();
                 })
                 .csrf(AbstractHttpConfigurer::disable);

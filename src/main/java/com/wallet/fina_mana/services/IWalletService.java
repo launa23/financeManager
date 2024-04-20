@@ -12,6 +12,8 @@ public interface IWalletService {
 
     Wallet getWalletById(long id, long userId) throws DataNotFoundException;
 
+    Wallet getFirstWalletByUserId(long userId) throws DataNotFoundException;
+
     List<Wallet> getAllWallets(long userId);
 
     Wallet updateWallet(long id, WalletDTO walletDTO, long userId) throws DataNotFoundException;
