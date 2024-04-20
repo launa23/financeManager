@@ -20,4 +20,5 @@ public class TransactionResponse {
     private String type;
     private String categoryName;
     private String walletName;
+//    private String walletIcon;
 }

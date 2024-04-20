@@ -77,6 +77,7 @@ public class CategoryService implements ICategoryService{
                         .id(category.getId())
                         .name(category.getName())
                         .icon(category.getIcon())
+                        .type(category.isType() ? 1 : 0)
                         .categoryOf(category.getUser() != null ? "User" : "System")
                         .build()).toList();
         // Lặp qua danh sách category trên, để lấy category con
@@ -86,6 +87,7 @@ public class CategoryService implements ICategoryService{
                             .id(category.getId())
                             .name(category.getName())
                             .icon(category.getIcon())
+                            .type(category.isType() ? 1 : 0)
                             .categoryOf(category.getUser() != null ? "User" : "System")
                             .build()).toList();
 

@@ -40,6 +40,7 @@ public class CategoryController {
                     .id(category.getId())
                     .name(category.getName())
                     .icon(category.getIcon())
+                    .type(category.isType() ? 1 : 0)
                     .categoryOf(category.getUser() != null ? "User" : "System")
                     .build();
             return ResponseEntity.ok(categoryResponse);
@@ -77,6 +78,7 @@ public class CategoryController {
                             .id(category.getId())
                             .name(category.getName())
                             .icon(category.getIcon())
+                            .type(category.isType() ? 1 : 0)
                             .categoryOf(category.getUser() != null ? "User" : "System")
                             .build()).toList();
             return ResponseEntity.ok(categoryResponses);
@@ -106,6 +108,7 @@ public class CategoryController {
                     .id(category.getId())
                     .name(category.getName())
                     .icon(category.getIcon())
+                    .type(category.isType() ? 1 : 0)
                     .categoryOf(category.getUser() != null ? "User" : "System")
                     .build();
             return ResponseEntity.ok(categoryResponse);
