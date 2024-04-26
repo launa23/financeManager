@@ -175,7 +175,7 @@ public class TransactionService implements ITransactionService{
             walletRepository.save(oldWallet);
         }
         transaction.setAmount(transactionDTO.getAmount());
-        transaction.setDescription(transaction.getDescription());
+        transaction.setDescription(transactionDTO.getDescription());
         transaction.setTime(transactionDTO.getTime());
         transaction.setCategory(category);
         transaction.setWallet(wallet);

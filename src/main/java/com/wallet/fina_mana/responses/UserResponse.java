@@ -14,6 +14,5 @@ public class UserResponse {
     private long id;
     private String fullName;
     private String phoneNumber;
-    private String address;
     private Date dateOfBirth;
 }

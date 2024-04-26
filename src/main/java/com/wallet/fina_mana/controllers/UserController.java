@@ -13,7 +13,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,10 +41,12 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody UserLoginDTO userLoginDTO){
+    public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO userLoginDTO){
         try {
             String token = userService.login(userLoginDTO.getUsername(), userLoginDTO.getPassword());
-            return ResponseEntity.ok(token);
+            Map<String, String> result = new HashMap<>();
+            result.put("token", token);
+            return ResponseEntity.ok(result);
         }
         catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());

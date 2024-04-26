@@ -36,7 +36,6 @@ public class UserService implements IUserService{
                 .username(userDTO.getUsername())
                 .phoneNumber(userDTO.getPhoneNumber())
                 .password(userDTO.getPassword())
-                .address(userDTO.getAddress())
                 .dateOfBirth(userDTO.getDateOfBirth())
                 .active(true)
                 .build();
