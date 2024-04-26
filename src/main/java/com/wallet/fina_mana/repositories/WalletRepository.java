@@ -12,6 +12,8 @@ public interface WalletRepository extends JpaRepository<Wallet, Long> {
 
     boolean existsByUserIdAndNameAndActive(long userId, String name, boolean active);
 
+    boolean existsByIdAndUserIdAndActiveAndBelongUser(long id, long userId, boolean active, boolean belongUser);
+
     Optional<Wallet> findByIdAndActive(long id, boolean active);
 
     Optional<Wallet> findByIdAndUserIdAndActive(long id, long userId, boolean active);

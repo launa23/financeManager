@@ -27,10 +27,12 @@ public class Wallet {
     private String money;
 
     @Column(name = "active")
-
     private boolean active;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(name = "belong_user", nullable = false)
+    private boolean belongUser;
 }

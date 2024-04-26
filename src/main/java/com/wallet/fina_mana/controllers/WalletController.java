@@ -33,12 +33,13 @@ public class WalletController {
                 return ResponseEntity.badRequest().body(errorMess);
             }
             User user = userService.getCurrent(request);
-            Wallet wallet = walletService.createWallet(walletDTO, user);
+            Wallet wallet = walletService.createWallet(walletDTO, user, true);
             WalletResponse walletResponse = WalletResponse.builder()
                     .id(wallet.getId())
                     .name(wallet.getName())
                     .money(wallet.getMoney())
                     .icon(wallet.getIcon())
+                    .belongUser(wallet.isBelongUser())
 //                    .userId(wallet.getUser().getId())
                     .build();
             return ResponseEntity.ok(walletResponse);
@@ -59,6 +60,7 @@ public class WalletController {
                             .name(wallet.getName())
                             .money(wallet.getMoney())
                             .icon(wallet.getIcon())
+                            .belongUser(wallet.isBelongUser())
                             .build()).toList();
             return ResponseEntity.ok(!walletResponses.isEmpty() ? walletResponses : "you don't have a wallet!");
         }
@@ -77,6 +79,7 @@ public class WalletController {
                     .name(wallet.getName())
                     .money(wallet.getMoney())
                     .icon(wallet.getIcon())
+                    .belongUser(wallet.isBelongUser())
                     .build();
             return ResponseEntity.ok(walletResponse);
         }
@@ -95,6 +98,7 @@ public class WalletController {
                     .name(wallet.getName())
                     .money(wallet.getMoney())
                     .icon(wallet.getIcon())
+                    .belongUser(wallet.isBelongUser())
                     .build();
             return ResponseEntity.ok(walletResponse);
         }
@@ -123,6 +127,7 @@ public class WalletController {
                     .name(wallet.getName())
                     .money(wallet.getMoney())
                     .icon(wallet.getIcon())
+                    .belongUser(wallet.isBelongUser())
                     .build();
             return ResponseEntity.ok(walletResponse);
         }

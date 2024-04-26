@@ -2,9 +2,11 @@ package com.wallet.fina_mana.controllers;
 
 import com.wallet.fina_mana.dtos.UserDTO;
 import com.wallet.fina_mana.dtos.UserLoginDTO;
+import com.wallet.fina_mana.dtos.WalletDTO;
 import com.wallet.fina_mana.models.User;
 import com.wallet.fina_mana.responses.UserResponse;
 import com.wallet.fina_mana.services.UserService;
+import com.wallet.fina_mana.services.WalletService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import java.util.Map;
 @RequestMapping("${api.prefix}/user")
 public class UserController {
     private final UserService userService;
+    private final WalletService walletService;
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO, BindingResult  result){
         try {
@@ -32,8 +35,10 @@ public class UserController {
             if (!userDTO.getPassword().equals(userDTO.getRetypePassword())){
                 return ResponseEntity.badRequest().body("Password does not match!");
             }
-            userService.createUser(userDTO);
-            return ResponseEntity.ok("Register sucessfully!");
+            WalletDTO walletDTO = new WalletDTO("Ví tiền mặt", "0", "wallet");
+            User user = userService.createUser(userDTO);
+            walletService.createWallet(walletDTO, user, false);
+            return ResponseEntity.ok("Register successfully!");
         }
         catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -8,7 +8,7 @@ import com.wallet.fina_mana.models.Wallet;
 import java.util.List;
 
 public interface IWalletService {
-    Wallet createWallet(WalletDTO walletDTO, User user) throws Exception;
+    Wallet createWallet(WalletDTO walletDTO, User user, boolean belongUser) throws Exception;
 
     Wallet getWalletById(long id, long userId) throws DataNotFoundException;
 

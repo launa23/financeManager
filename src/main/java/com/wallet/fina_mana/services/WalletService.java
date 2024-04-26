@@ -20,7 +20,7 @@ public class WalletService implements IWalletService{
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository;
     @Override
-    public Wallet createWallet(WalletDTO walletDTO, User user) throws Exception {
+    public Wallet createWallet(WalletDTO walletDTO, User user, boolean belongUser) throws Exception {
         if (walletRepository.existsByUserIdAndNameAndActive(user.getId(), walletDTO.getName(), true)){
             throw new Exception("Wallet's name is already exist");
         }
@@ -30,6 +30,7 @@ public class WalletService implements IWalletService{
                 .money(walletDTO.getMoney())
                 .user(user)
                 .active(true)
+                .belongUser(belongUser)
                 .build();
         return walletRepository.save(wallet);
     }
@@ -66,6 +67,9 @@ public class WalletService implements IWalletService{
         // Xóa cứng, xóa ví thì sẽ xoá luôn giao dịch trong ví
         Wallet existingWallet = walletRepository.findByIdAndUserIdAndActive(id, userId, true)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find wallet id: " + id));
+        if(walletRepository.existsByIdAndUserIdAndActiveAndBelongUser(id, userId, true, false)){
+            throw new DataNotFoundException("Unable to delete system wallet!");
+        }
         List<Transaction> transactionList = transactionRepository.findByWalletId(id);
         if (!transactionList.isEmpty()){
             transactionRepository.deleteAllInBatch(transactionList);
