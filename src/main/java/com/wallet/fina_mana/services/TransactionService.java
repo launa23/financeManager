@@ -67,7 +67,9 @@ public class TransactionService implements ITransactionService{
                         .description(transaction.getDescription())
                         .type(transaction.isType() ? "Income" : "Outcome")
                         .image(transaction.getCategory().getIcon())
+                        .idCategory(transaction.getCategory().getId())
                         .categoryName(transaction.getCategory().getName())
+                        .idWallet(transaction.getWallet().getId())
                         .walletName(transaction.getWallet().getName())
                         .build())
                 .toList();
@@ -85,7 +87,9 @@ public class TransactionService implements ITransactionService{
                         .description(transaction.getDescription())
                         .type(transaction.isType() ? "Income" : "Outcome")
                         .image(transaction.getCategory().getIcon())
+                        .idCategory(transaction.getCategory().getId())
                         .categoryName(transaction.getCategory().getName())
+                        .idWallet(transaction.getWallet().getId())
                         .walletName(transaction.getWallet().getName())
                         .build())
                 .toList();
@@ -102,7 +106,9 @@ public class TransactionService implements ITransactionService{
                         .description(transaction.getDescription())
                         .type(transaction.isType() ? "Income" : "Outcome")
                         .image(transaction.getCategory().getIcon())
+                        .idCategory(transaction.getCategory().getId())
                         .categoryName(transaction.getCategory().getName())
+                        .idWallet(transaction.getWallet().getId())
                         .walletName(transaction.getWallet().getName())
                         .build())
                 .toList();
@@ -123,7 +129,9 @@ public class TransactionService implements ITransactionService{
                         .description(transaction.getDescription())
                         .type(transaction.isType() ? "Income" : "Outcome")
                         .image(transaction.getCategory().getIcon())
+                        .idCategory(transaction.getCategory().getId())
                         .categoryName(transaction.getCategory().getName())
+                        .idWallet(transaction.getWallet().getId())
                         .walletName(transaction.getWallet().getName())
                         .build())
                 .toList();
@@ -205,7 +213,9 @@ public class TransactionService implements ITransactionService{
                         .description(transaction.getDescription())
                         .type(transaction.isType() ? "Income" : "Outcome")
                         .image(transaction.getCategory().getIcon())
+                        .idCategory(transaction.getCategory().getId())
                         .categoryName(transaction.getCategory().getName())
+                        .idWallet(transaction.getWallet().getId())
                         .walletName(transaction.getWallet().getName())
                         .build())
                 .toList();;
