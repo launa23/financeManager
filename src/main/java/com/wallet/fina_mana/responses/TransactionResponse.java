@@ -18,9 +18,9 @@ public class TransactionResponse {
     private String description;
     private LocalDateTime time;
     private String type;
-    private long idCategory;
+    private long category_id;
     private String categoryName;
-    private long idWallet;
+    private long wallet_id;
     private String walletName;
 //    private String walletIcon;
 }

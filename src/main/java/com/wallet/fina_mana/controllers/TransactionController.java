@@ -47,9 +47,9 @@ public class TransactionController {
                     .description(transaction.getDescription())
                     .type(transaction.isType() ? "Income" : "Outcome")
                     .image(transaction.getCategory().getIcon())
-                    .idCategory(transaction.getCategory().getId())
+                    .category_id(transaction.getCategory().getId())
                     .categoryName(transaction.getCategory().getName())
-                    .idWallet(transaction.getWallet().getId())
+                    .wallet_id(transaction.getWallet().getId())
                     .walletName(transaction.getWallet().getName())
                     .build();
             return ResponseEntity.ok(transactionResponse);
@@ -174,9 +174,9 @@ public class TransactionController {
                     .description(transaction.getDescription())
                     .type(transaction.isType() ? "Income" : "Outcome")
                     .image(transaction.getCategory().getIcon())
-                    .idCategory(transaction.getCategory().getId())
+                    .category_id(transaction.getCategory().getId())
                     .categoryName(transaction.getCategory().getName())
-                    .idWallet(transaction.getWallet().getId())
+                    .wallet_id(transaction.getWallet().getId())
                     .walletName(transaction.getWallet().getName())
                     .build();
             return ResponseEntity.ok(transactionResponse);
