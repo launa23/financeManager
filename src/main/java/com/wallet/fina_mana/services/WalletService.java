@@ -77,4 +77,14 @@ public class WalletService implements IWalletService{
 //        existingWallet.setActive(false);
         walletRepository.delete(existingWallet);
     }
+
+    @Override
+    public Wallet updateWalletByName(WalletDTO walletDTO, long userId) throws DataNotFoundException {
+        Wallet existingWallet = walletRepository.findByUserIdAndNameAndActive(userId, walletDTO.getName(),  true)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find wallet name: " + walletDTO.getName()));
+//        existingWallet.setName(walletDTO.getName());
+//        existingWallet.setIcon(walletDTO.getIcon());
+        existingWallet.setMoney(walletDTO.getMoney());
+        return walletRepository.save(existingWallet);
+    }
 }

@@ -34,7 +34,7 @@ public class UserService implements IUserService{
         User user = User.builder()
                 .fullName(userDTO.getFullName())
                 .username(userDTO.getUsername())
-                .phoneNumber(userDTO.getPhoneNumber())
+                .email(userDTO.getEmail())
                 .password(userDTO.getPassword())
                 .dateOfBirth(userDTO.getDateOfBirth())
                 .active(true)

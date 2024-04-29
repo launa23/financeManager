@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface WalletRepository extends JpaRepository<Wallet, Long> {
     List<Wallet> findByUserIdAndActive(long id, boolean active);
 
+    Optional<Wallet> findByUserIdAndNameAndActive(long userId, String name,  boolean active);
+
     boolean existsByUserIdAndNameAndActive(long userId, String name, boolean active);
 
     boolean existsByIdAndUserIdAndActiveAndBelongUser(long id, long userId, boolean active, boolean belongUser);

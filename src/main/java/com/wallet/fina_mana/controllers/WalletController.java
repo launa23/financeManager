@@ -136,6 +136,32 @@ public class WalletController {
         }
     }
 
+    @PutMapping("/update/first")
+    public ResponseEntity<?> updateWalletByName(@Valid @RequestBody WalletDTO walletDTO,
+                                          HttpServletRequest request,
+                                          BindingResult result){
+        try {
+            if (result.hasErrors()){
+                List<String> errorMess = result.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
+                return ResponseEntity.badRequest().body(errorMess);
+            }
+            long userId = userService.getCurrent(request).getId();
+            Wallet wallet = walletService.updateWalletByName(walletDTO, userId);
+
+            WalletResponse walletResponse = WalletResponse.builder()
+                    .id(wallet.getId())
+                    .name(wallet.getName())
+                    .money(wallet.getMoney())
+                    .icon(wallet.getIcon())
+                    .belongUser(wallet.isBelongUser())
+                    .build();
+            return ResponseEntity.ok(walletResponse);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteWallet(@PathVariable("id") long id, HttpServletRequest request){
         try {

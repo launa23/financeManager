@@ -19,4 +19,6 @@ public interface IWalletService {
     Wallet updateWallet(long id, WalletDTO walletDTO, long userId) throws DataNotFoundException;
 
     void deleteWallet(long id, long userId) throws DataNotFoundException;
+
+    Wallet updateWalletByName(WalletDTO walletDTO, long userId) throws DataNotFoundException;
 }

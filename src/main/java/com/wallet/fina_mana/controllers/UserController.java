@@ -61,7 +61,14 @@ public class UserController {
     @GetMapping("/current")
     public ResponseEntity<?> getCurrentUser(HttpServletRequest request){
         try{
-            User userResponse = userService.getCurrent(request);
+
+            User user = userService.getCurrent(request);
+            UserResponse userResponse = UserResponse.builder()
+                    .id(user.getId())
+                    .fullName(user.getFullName())
+                    .email(user.getEmail())
+                    .dateOfBirth(user.getDateOfBirth())
+                    .build();
             return ResponseEntity.ok(userResponse);
         }
         catch (Exception e){
