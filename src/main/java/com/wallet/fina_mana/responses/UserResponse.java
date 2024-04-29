@@ -13,6 +13,7 @@ import java.util.Date;
 public class UserResponse {
     private long id;
     private String fullName;
+    private String username;
     private String email;
     private Date dateOfBirth;
 }

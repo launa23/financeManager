@@ -66,6 +66,7 @@ public class UserController {
             UserResponse userResponse = UserResponse.builder()
                     .id(user.getId())
                     .fullName(user.getFullName())
+                    .username(user.getUsername())
                     .email(user.getEmail())
                     .dateOfBirth(user.getDateOfBirth())
                     .build();
