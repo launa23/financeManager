@@ -22,6 +22,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     Optional<Transaction> findByIdAndWallet_UserIdAndActiveAndType(long id, Long wallet_user_id, boolean active, boolean type);
 
+    Optional<Transaction> findByIdAndWallet_UserIdAndActive(long id, Long wallet_user_id, boolean active);
+
     @Query(value = "select tr.* from transactions as tr inner join wallets as w on w.id = tr.wallet_id" +
             " where w.user_id = :user_id and tr.wallet_id = :wallet_id and MONTH(tr.time) = :month and YEAR(tr.time) = :year and tr.active = 1 order by tr.time desc", nativeQuery = true)
     List<Transaction> findByMonthAndYear(@Param("month") int month, @Param("year") int year, @Param("user_id") long user_id, @Param("wallet_id") long walletId);
