@@ -56,6 +56,9 @@ public class WalletService implements IWalletService{
     public Wallet updateWallet(long id, WalletDTO walletDTO, long userId) throws DataNotFoundException {
         Wallet existingWallet = walletRepository.findByIdAndUserIdAndActive(id, userId, true)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find wallet id: " + id));
+        if(walletRepository.findDifferentIdAndSameName(walletDTO.getName(), userId, id) != null){
+            throw new DataNotFoundException("Wallet's name is already exist!");
+        }
         existingWallet.setName(walletDTO.getName());
         existingWallet.setIcon(walletDTO.getIcon());
         existingWallet.setMoney(walletDTO.getMoney());
@@ -80,7 +83,7 @@ public class WalletService implements IWalletService{
 
     @Override
     public Wallet updateWalletByName(WalletDTO walletDTO, long userId) throws DataNotFoundException {
-        Wallet existingWallet = walletRepository.findByUserIdAndNameAndActive(userId, walletDTO.getName(),  true)
+        Wallet existingWallet = walletRepository.findByUserIdAndNameAndActive(userId, "Ví tiền mặt",  true)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find wallet name: " + walletDTO.getName()));
 //        existingWallet.setName(walletDTO.getName());
 //        existingWallet.setIcon(walletDTO.getIcon());

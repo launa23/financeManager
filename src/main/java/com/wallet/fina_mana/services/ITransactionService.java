@@ -3,6 +3,7 @@ package com.wallet.fina_mana.services;
 import com.wallet.fina_mana.dtos.TransactionDTO;
 import com.wallet.fina_mana.models.Transaction;
 import com.wallet.fina_mana.models.Wallet;
+import com.wallet.fina_mana.responses.StatisticTransaction;
 import com.wallet.fina_mana.responses.TransByDateResponse;
 import com.wallet.fina_mana.responses.TransactionResponse;
 
@@ -20,6 +21,10 @@ public interface ITransactionService {
     List<TransactionResponse> getAllTransactionsByUserAndType(long userId, boolean type) throws Exception;
 
     List<TransactionResponse> getTransactionInWalletByType(long userId, long walletId, boolean type) throws Exception;
+
+    List<StatisticTransaction> getStatisticTransaction(long userId) throws Exception;
+    List<StatisticTransaction> getStatisticTransactionByMonth(long userId) throws Exception;
+    List<StatisticTransaction> getStatisticTransactionByYear(long userId) throws Exception;
 
     Transaction updateTransaction(long[] userId, long id, TransactionDTO transactionDTO, boolean type) throws Exception;
     List<TransByDateResponse> getByMonthAndYear(long userId, int month, int year, long walletId) throws Exception;

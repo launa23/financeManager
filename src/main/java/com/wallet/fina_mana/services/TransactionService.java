@@ -8,9 +8,12 @@ import com.wallet.fina_mana.models.Wallet;
 import com.wallet.fina_mana.repositories.CategoryRepository;
 import com.wallet.fina_mana.repositories.TransactionRepository;
 import com.wallet.fina_mana.repositories.WalletRepository;
+import com.wallet.fina_mana.responses.StatisticTransaction;
 import com.wallet.fina_mana.responses.TransByDateResponse;
 import com.wallet.fina_mana.responses.TransactionResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,6 +25,9 @@ public class TransactionService implements ITransactionService{
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
     private final CategoryRepository categoryRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public Transaction createTransaction(long[] userId, TransactionDTO transactionDTO, boolean type) throws Exception {
@@ -135,6 +141,22 @@ public class TransactionService implements ITransactionService{
                         .walletName(transaction.getWallet().getName())
                         .build())
                 .toList();
+    }
+
+    @Override
+    public List<StatisticTransaction> getStatisticTransaction(long userId) throws Exception {
+        List<StatisticTransaction> result =  getAnotherTableData(userId);
+        return result;
+    }
+
+    @Override
+    public List<StatisticTransaction> getStatisticTransactionByMonth(long userId) throws Exception {
+        return getAnotherTableData2(userId);
+    }
+
+    @Override
+    public List<StatisticTransaction> getStatisticTransactionByYear(long userId) throws Exception {
+        return getAnotherTableData3(userId);
     }
 
     @Override
@@ -322,5 +344,60 @@ public class TransactionService implements ITransactionService{
         transaction.setActive(false);
         transactionRepository.save(transaction);
     }
+    private List<StatisticTransaction> getAnotherTableData(long userId) {
+        String sql = "SELECT DATE(transactions.time) AS date,\n" +
+                "       SUM(CASE WHEN transactions.type = 1 THEN transactions.amount ELSE 0 END) AS total_income,\n" +
+                "       SUM(CASE WHEN transactions.type = 0 THEN transactions.amount ELSE 0 END) AS total_outcome\n" +
+                "FROM transactions\n" +
+                "inner JOIN wallets ON transactions.wallet_id = wallets.id\n" +
+                "WHERE transactions.time >= DATE(DATE_SUB(NOW(), INTERVAL 7 DAY))\n" +
+                "  AND transactions.time < DATE(DATE_ADD(NOW(), INTERVAL 1 DAY))\n" +
+                "  AND transactions.active = 1 AND wallets.user_id =" + userId +
+                " GROUP BY DATE(transactions.time) ORDER BY date ASC";
+        return jdbcTemplate.query(sql, (resultSet, rowNum) -> {
+            StatisticTransaction statisticTransaction = new StatisticTransaction();
+            statisticTransaction.setDate(resultSet.getString("date"));
+            statisticTransaction.setTotalIncome(resultSet.getString("total_income"));
+            statisticTransaction.setTotalOutcome(resultSet.getString("total_outcome"));
+            return statisticTransaction;
+        });
+    }
 
+    private List<StatisticTransaction> getAnotherTableData2(long userId) {
+        String sql = "SELECT MONTH(transactions.time) AS date,\n" +
+                "       SUM(CASE WHEN transactions.type = 1 THEN transactions.amount ELSE 0 END) AS total_income,\n" +
+                "       SUM(CASE WHEN transactions.type = 0 THEN transactions.amount ELSE 0 END) AS total_outcome\n" +
+                "FROM transactions\n" +
+                "inner JOIN wallets ON transactions.wallet_id = wallets.id\n" +
+                "WHERE transactions.time >= DATE(DATE_SUB(NOW(), INTERVAL 5 MONTH))\n" +
+                "  AND transactions.time < DATE(DATE_ADD(NOW(), INTERVAL 1 MONTH))\n" +
+                "  AND transactions.active = 1 AND wallets.user_id =" + userId +
+                " GROUP BY MONTH(transactions.time) ORDER BY date ASC";
+        return jdbcTemplate.query(sql, (resultSet, rowNum) -> {
+            StatisticTransaction statisticTransaction = new StatisticTransaction();
+            statisticTransaction.setDate(resultSet.getString("date"));
+            statisticTransaction.setTotalIncome(resultSet.getString("total_income"));
+            statisticTransaction.setTotalOutcome(resultSet.getString("total_outcome"));
+            return statisticTransaction;
+        });
+    }
+
+    private List<StatisticTransaction> getAnotherTableData3(long userId) {
+        String sql = "SELECT YEAR(transactions.time) AS date,\n" +
+                "       SUM(CASE WHEN transactions.type = 1 THEN transactions.amount ELSE 0 END) AS total_income,\n" +
+                "       SUM(CASE WHEN transactions.type = 0 THEN transactions.amount ELSE 0 END) AS total_outcome\n" +
+                "FROM transactions\n" +
+                "inner JOIN wallets ON transactions.wallet_id = wallets.id\n" +
+                "WHERE transactions.time >= DATE(DATE_SUB(NOW(), INTERVAL 2 YEAR))\n" +
+                "  AND transactions.time < DATE(DATE_ADD(NOW(), INTERVAL 1 YEAR))\n" +
+                "  AND transactions.active = 1 AND wallets.user_id =" + userId +
+                " GROUP BY YEAR(transactions.time) ORDER BY date ASC";
+        return jdbcTemplate.query(sql, (resultSet, rowNum) -> {
+            StatisticTransaction statisticTransaction = new StatisticTransaction();
+            statisticTransaction.setDate(resultSet.getString("date"));
+            statisticTransaction.setTotalIncome(resultSet.getString("total_income"));
+            statisticTransaction.setTotalOutcome(resultSet.getString("total_outcome"));
+            return statisticTransaction;
+        });
+    }
 }

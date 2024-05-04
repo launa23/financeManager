@@ -2,6 +2,7 @@ package com.wallet.fina_mana.controllers;
 
 import com.wallet.fina_mana.dtos.TransactionDTO;
 import com.wallet.fina_mana.models.Transaction;
+import com.wallet.fina_mana.responses.StatisticTransaction;
 import com.wallet.fina_mana.responses.TransByDateResponse;
 import com.wallet.fina_mana.responses.TransactionResponse;
 import com.wallet.fina_mana.services.TransactionService;
@@ -16,6 +17,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -143,6 +145,26 @@ public class TransactionController {
             boolean typeBoolean = type.equals("income");
 
             List<TransactionResponse> transactionResponses = transactionService.getTransactionInWalletByType(userIds[1], walletId, typeBoolean);
+            return ResponseEntity.ok(transactionResponses);
+
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/statistic")
+    public ResponseEntity<?> getStatistic(@RequestParam("when") String when, HttpServletRequest request){
+        try {
+            long userId = userService.getCurrent(request).getId();
+            List<StatisticTransaction> transactionResponses = new ArrayList<>();
+            if (when.equals("today")){
+                transactionResponses = transactionService.getStatisticTransaction(userId);
+            } else if (when.equals("thisMonth")) {
+                transactionResponses = transactionService.getStatisticTransactionByMonth(userId);
+            } else if (when.equals("thisYear")) {
+                transactionResponses = transactionService.getStatisticTransactionByYear(userId);
+            }
             return ResponseEntity.ok(transactionResponses);
 
         }
