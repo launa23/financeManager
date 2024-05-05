@@ -2,6 +2,7 @@ package com.wallet.fina_mana.controllers;
 
 import com.wallet.fina_mana.dtos.TransactionDTO;
 import com.wallet.fina_mana.models.Transaction;
+import com.wallet.fina_mana.responses.StatisticByCategoryResponse;
 import com.wallet.fina_mana.responses.StatisticTransaction;
 import com.wallet.fina_mana.responses.TransByDateResponse;
 import com.wallet.fina_mana.responses.TransactionResponse;
@@ -166,6 +167,23 @@ public class TransactionController {
                 transactionResponses = transactionService.getStatisticTransactionByYear(userId);
             }
             return ResponseEntity.ok(transactionResponses);
+
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/statistic/category")
+    public ResponseEntity<?> getStatisticByCategory(@RequestParam("start") String start,
+                                                    @RequestParam("end") String end,
+                                                    @RequestParam("type") String type,
+                                                    HttpServletRequest request){
+        try {
+            long userId = userService.getCurrent(request).getId();
+            boolean typeBoolean = type.equals("income");
+            List<StatisticByCategoryResponse> statistic = transactionService.getStatisticByCategory(userId, start, end, typeBoolean);
+            return ResponseEntity.ok(statistic);
 
         }
         catch (Exception e){

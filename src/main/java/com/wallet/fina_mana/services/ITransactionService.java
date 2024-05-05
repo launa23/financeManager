@@ -3,6 +3,7 @@ package com.wallet.fina_mana.services;
 import com.wallet.fina_mana.dtos.TransactionDTO;
 import com.wallet.fina_mana.models.Transaction;
 import com.wallet.fina_mana.models.Wallet;
+import com.wallet.fina_mana.responses.StatisticByCategoryResponse;
 import com.wallet.fina_mana.responses.StatisticTransaction;
 import com.wallet.fina_mana.responses.TransByDateResponse;
 import com.wallet.fina_mana.responses.TransactionResponse;
@@ -25,7 +26,7 @@ public interface ITransactionService {
     List<StatisticTransaction> getStatisticTransaction(long userId) throws Exception;
     List<StatisticTransaction> getStatisticTransactionByMonth(long userId) throws Exception;
     List<StatisticTransaction> getStatisticTransactionByYear(long userId) throws Exception;
-
+    List<StatisticByCategoryResponse> getStatisticByCategory(long userId, String start, String end, boolean type) throws Exception;
     Transaction updateTransaction(long[] userId, long id, TransactionDTO transactionDTO, boolean type) throws Exception;
     List<TransByDateResponse> getByMonthAndYear(long userId, int month, int year, long walletId) throws Exception;
     Map<String, String> getTotalIncomeAndOutcome(long userId, int month, int year, long walletId) throws Exception;

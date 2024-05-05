@@ -8,14 +8,13 @@ import com.wallet.fina_mana.models.Wallet;
 import com.wallet.fina_mana.repositories.CategoryRepository;
 import com.wallet.fina_mana.repositories.TransactionRepository;
 import com.wallet.fina_mana.repositories.WalletRepository;
-import com.wallet.fina_mana.responses.StatisticTransaction;
-import com.wallet.fina_mana.responses.TransByDateResponse;
-import com.wallet.fina_mana.responses.TransactionResponse;
+import com.wallet.fina_mana.responses.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -157,6 +156,20 @@ public class TransactionService implements ITransactionService{
     @Override
     public List<StatisticTransaction> getStatisticTransactionByYear(long userId) throws Exception {
         return getAnotherTableData3(userId);
+    }
+
+    @Override
+    public List<StatisticByCategoryResponse> getStatisticByCategory(long userId, String start, String end, boolean type) throws Exception {
+        List<StatisticByCategory> statisticByCategories = getAnotherTableData4(userId, start, end, type);
+
+        return statisticByCategories.stream()
+                .map(statisticByCategory -> StatisticByCategoryResponse.builder()
+                        .id(statisticByCategory.getCategory().getId())
+                        .name(statisticByCategory.getCategory().getName())
+                        .icon(statisticByCategory.getCategory().getIcon())
+                        .total(statisticByCategory.getTotal())
+                        .build())
+                .toList();
     }
 
     @Override
@@ -397,6 +410,22 @@ public class TransactionService implements ITransactionService{
             statisticTransaction.setDate(resultSet.getString("date"));
             statisticTransaction.setTotalIncome(resultSet.getString("total_income"));
             statisticTransaction.setTotalOutcome(resultSet.getString("total_outcome"));
+            return statisticTransaction;
+        });
+    }
+
+    private List<StatisticByCategory> getAnotherTableData4(long userId, String start, String end, boolean type) {
+        String sql = "SELECT COALESCE(ch.category_id, tr.category_id) as category_id, sum(amount) as total FROM transactions as tr\n" +
+                "INNER JOIN wallets on wallets.id = tr.wallet_id\n" +
+                "LEFT JOIN category_hierarchy as ch on tr.category_id = ch.child_id\n" +
+                " WHERE wallets.user_id =" +userId+ " and tr.active = 1 and type =" +type+ " and DATE(time) BETWEEN '" +start+ "' AND '" +end+"'\n" +
+                "GROUP BY category_id";
+        return jdbcTemplate.query(sql, (resultSet, rowNum) -> {
+            StatisticByCategory statisticTransaction = new StatisticByCategory();
+            Category category = categoryRepository.findById(resultSet.getLong("category_id"))
+                    .orElseThrow(() -> new DateTimeException("Not find category!"));
+            statisticTransaction.setCategory(category);
+            statisticTransaction.setTotal(resultSet.getString("total"));
             return statisticTransaction;
         });
     }
