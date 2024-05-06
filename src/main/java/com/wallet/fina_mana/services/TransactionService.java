@@ -419,7 +419,7 @@ public class TransactionService implements ITransactionService{
                 "INNER JOIN wallets on wallets.id = tr.wallet_id\n" +
                 "LEFT JOIN category_hierarchy as ch on tr.category_id = ch.child_id\n" +
                 " WHERE wallets.user_id =" +userId+ " and tr.active = 1 and type =" +type+ " and DATE(time) BETWEEN '" +start+ "' AND '" +end+"'\n" +
-                "GROUP BY category_id";
+                "GROUP BY category_id ORDER BY total desc";
         return jdbcTemplate.query(sql, (resultSet, rowNum) -> {
             StatisticByCategory statisticTransaction = new StatisticByCategory();
             Category category = categoryRepository.findById(resultSet.getLong("category_id"))
