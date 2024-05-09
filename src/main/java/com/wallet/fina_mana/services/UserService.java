@@ -49,11 +49,11 @@ public class UserService implements IUserService{
     public String login(String username, String password) throws Exception {
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()){
-            throw new DataNotFoundException("Invalid phone number or password");
+            throw new DataNotFoundException("Tên tài khoản không tồn tại!");
         }
         User existingUser = optionalUser.get();
         if (!passwordEncoder.matches(password, existingUser.getPassword())){
-            throw new BadCredentialsException("Wrong username or password");
+            throw new BadCredentialsException("Tài khoản hoặc mật khẩu không đúng!");
         }
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 username, password

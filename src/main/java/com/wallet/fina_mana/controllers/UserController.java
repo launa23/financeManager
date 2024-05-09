@@ -4,6 +4,7 @@ import com.wallet.fina_mana.dtos.UserDTO;
 import com.wallet.fina_mana.dtos.UserLoginDTO;
 import com.wallet.fina_mana.dtos.WalletDTO;
 import com.wallet.fina_mana.models.User;
+import com.wallet.fina_mana.responses.LoginResponse;
 import com.wallet.fina_mana.responses.UserResponse;
 import com.wallet.fina_mana.services.UserService;
 import com.wallet.fina_mana.services.WalletService;
@@ -51,10 +52,12 @@ public class UserController {
             String token = userService.login(userLoginDTO.getUsername(), userLoginDTO.getPassword());
             Map<String, String> result = new HashMap<>();
             result.put("token", token);
-            return ResponseEntity.ok(result);
+            LoginResponse loginResponse = new LoginResponse("Successfully", token, "");
+            return ResponseEntity.ok(loginResponse);
         }
         catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+            LoginResponse loginResponse = new LoginResponse("Failure", "", e.getMessage());
+            return ResponseEntity.ok(loginResponse);
         }
     }
 
