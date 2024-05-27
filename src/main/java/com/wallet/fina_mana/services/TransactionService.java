@@ -83,7 +83,7 @@ public class TransactionService implements ITransactionService{
 
     @Override
     public List<TransactionResponse> getAllTransactionsByUser(long userId) throws Exception {
-        return transactionRepository.findByWallet_UserIdAndActive(userId, true)
+        return transactionRepository.findByWallet_UserIdAndActiveOrderByTimeDesc(userId, true)
                 .stream().map(transaction -> TransactionResponse.builder()
                         .id(transaction.getId())
                         .amount(transaction.getAmount())
@@ -303,6 +303,53 @@ public class TransactionService implements ITransactionService{
             }
         }
 
+        return transByDateResponses;
+    }
+
+    @Override
+    public List<TransByDateResponse> getByDateStartAndEnd(long userId, String start, String end) throws Exception {
+        List<Transaction> trans = transactionRepository.findDateToStartAndEnd(start, end, userId);
+
+        List<TransactionResponse> transactions = trans.stream()
+                .map(transaction -> TransactionResponse.builder()
+                        .id(transaction.getId())
+                        .amount(transaction.getAmount())
+                        .image(transaction.getCategory().getIcon())
+                        .time(transaction.getTime())
+                        .description(transaction.getDescription())
+                        .type(transaction.isType() ? "Income" : "Outcome")
+                        .image(transaction.getCategory().getIcon())
+                        .category_id(transaction.getCategory().getId())
+                        .categoryName(transaction.getCategory().getName())
+                        .wallet_id(transaction.getWallet().getId())
+                        .walletName(transaction.getWallet().getName())
+                        .build())
+                .toList();;
+        List<TransByDateResponse> transByDateResponses = new ArrayList<>();
+
+        for (TransactionResponse tr : transactions) {
+            String date = tr.getTime().toString().substring(0, 10);
+            if (transByDateResponses.isEmpty()){
+                List<TransactionResponse> transactionResponses = new ArrayList<>();
+                transactionResponses.add(tr);
+                transByDateResponses.add(new TransByDateResponse(date, transactionResponses));
+            }
+            else {
+                int flag = 0;
+                for (TransByDateResponse trdr: transByDateResponses) {
+                    if (date.equals(trdr.getTime())){
+                        trdr.getTransactionResponseList().add(tr);
+                        flag = 1;
+                        break;
+                    }
+                }
+                if (flag == 0){
+                    List<TransactionResponse> transactionResponses = new ArrayList<>();
+                    transactionResponses.add(tr);
+                    transByDateResponses.add(new TransByDateResponse(date, transactionResponses));
+                }
+            }
+        }
         return transByDateResponses;
     }
 

@@ -184,13 +184,24 @@ public class TransactionController {
             boolean typeBoolean = type.equals("income");
             List<StatisticByCategoryResponse> statistic = transactionService.getStatisticByCategory(userId, start, end, typeBoolean);
             return ResponseEntity.ok(statistic);
-
         }
         catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
+    @GetMapping("/getByDate")
+    public ResponseEntity<?> getByDate(@RequestParam("start") String start,
+                                       @RequestParam("end") String end,
+                                       HttpServletRequest request){
+        try {
+            long userId = userService.getCurrent(request).getId();
+            List<TransByDateResponse> statistic = transactionService.getByDateStartAndEnd(userId, start, end);
+            return ResponseEntity.ok(statistic);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
     @PutMapping("update/{type}/{id}")
     public ResponseEntity<?> updateTransaction(@PathVariable("id") long id,
                                                @PathVariable("type") String type,

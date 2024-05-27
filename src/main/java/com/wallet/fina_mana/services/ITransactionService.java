@@ -29,6 +29,7 @@ public interface ITransactionService {
     List<StatisticByCategoryResponse> getStatisticByCategory(long userId, String start, String end, boolean type) throws Exception;
     Transaction updateTransaction(long[] userId, long id, TransactionDTO transactionDTO, boolean type) throws Exception;
     List<TransByDateResponse> getByMonthAndYear(long userId, int month, int year, long walletId) throws Exception;
+    List<TransByDateResponse> getByDateStartAndEnd(long userId, String start, String end) throws Exception;
     Map<String, String> getTotalIncomeAndOutcome(long userId, int month, int year, long walletId) throws Exception;
     void deleteTransaction(long userId, long id, boolean type) throws Exception;
 }
