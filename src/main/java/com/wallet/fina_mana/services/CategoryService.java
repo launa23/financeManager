@@ -101,7 +101,7 @@ public class CategoryService implements ICategoryService{
         Category category = categoryRepository.findByIdAndUserIdAndType(id, userId[1], type)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find category: " + id));
 
-        if (categoryRepository.findDifferentIdAndSameName(id, categoryDTO.getName(), true, userId) != null){
+        if (categoryRepository.findDifferentIdAndSameName(id, categoryDTO.getName(), type, userId) != null){
             throw new Exception("Category is already exist");
         }
         category.setName(categoryDTO.getName());
